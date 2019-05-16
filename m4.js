@@ -13,8 +13,8 @@ const val = [
   [2],
   [ [[1,2,3], [1,2,3]], 
     [[2],[2,3]],
-    [[null],[null]],
-    [[null],[2,3]]
+    [[],[]],
+    [[],[2,3]]
   ],
 ];
 
@@ -30,19 +30,29 @@ var AFNDtoAFD = (elements) => {
     map[i] = transitions[i];
   }
 
-  let aux = [];
-
   for(let i of transitions){
     for(let j of i){
       if(!Object.keys(map).includes(j.join('')) && j[0] != null){ // add new states
-        //map[j.join('')] = [];
-        for(let k of j){
-          console.log(k);
+        let arrC = [];
+        for(let w in alphabet){ // find transition in x,y
+          let aux = new Set();
+          for(let k of j){ // new state
+              for(let z of transitions[k][w]){
+                aux.add(z);
+              }
+          }
+          arrC.push( [...aux].filter(x => x));
         }
-        console.log();
+        map[j.join('')] = arrC;
       }
     }
   }
+
+  console.log(map);
+
+}
+
+var newStates = (transitions) => {
 
 }
 
