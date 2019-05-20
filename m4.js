@@ -21,7 +21,7 @@ var newStates = (map,alphabet,transitions,finalS) =>{
   let flag = false;
 
   if(Object.keys(map).length != 0){
-    arrayS.push(map[Object.keys(map)[0]]);// add initial state to array
+    arrayS.push(map[Object.keys(map)[0]]);// Agregamos el estado inicial al arreglo
   }
 
   for(let i=0;i<Object.keys(map).length;i++){ // buscamos en los estados de la tabla
@@ -40,7 +40,7 @@ var newStates = (map,alphabet,transitions,finalS) =>{
               }
             }
           }
-          if(aux.size == 0) aux.add('/'); // add '/' state
+          if(aux.size == 0) aux.add('/'); // Agregamos el estado de error '/' 
           arrC.push([...aux].filter(x => x));
         }
         arrayS.push(arrC);
@@ -58,11 +58,22 @@ var newStates = (map,alphabet,transitions,finalS) =>{
     map['/'] = arrC;
   }
 
-  console.log(map);
-  console.log(arrayS);
+  let finalSaux = [];
+
+  for(let i of Object.keys(map)){
+    for(let j of finalS){
+      if(i.split('').includes(j)){
+        finalSaux.push(i);
+      }
+    }
+  }
+
+  console.log(finalSaux); // estados finales
+  console.log(map); // tabla con etiquetas
+  //console.log(arrayS); // tabla sin etiquetas
 
   // add final states 
-  return map, finalS;
+  return [map, finalSaux];
 }
 
 var AFNDtoAFD = (alphabet, initialS, finalS, transitions) => {
@@ -72,9 +83,12 @@ var AFNDtoAFD = (alphabet, initialS, finalS, transitions) => {
 
   map[initialS] = transitions[initialS];
   
-  newStates(map,alphabet,transitions,finalS);
+  let ans = newStates(map,alphabet,transitions,finalS);
 
-  return alphabet, initialS, finalS, map;
+  map = ans[0];
+  finalS = ans[1];
+
+  return [alphabet, initialS, finalS, map];
 }
 
 AFNDtoAFD(alphabet, initialS, finalS, transitions);
