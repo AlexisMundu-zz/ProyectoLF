@@ -1,6 +1,6 @@
 'use strict'
 //input
-    let postfija = '&a.c,Ee,.x.';
+    let postfija = 'ab+.c.';
 /*
 DEFINICIONES:
 Epsilon = $
@@ -24,6 +24,7 @@ Cerradura positiva = +
     let orFinalState =0;
     let checkOrFirst = postfija.substring(0,5);
     let i=0;
+    let flag = false;
 
     //define el alfabeto de la expresion postfija recibida
     alphabet= defineAlphabet(postfija,alphabet);
@@ -34,6 +35,9 @@ Cerradura positiva = +
             let subs = checkOrFirst.substring(0,i);
             if(!subs.includes('.')){ 
                 actualState = or(actualState,i-1);
+                if(!flag)
+                i+=1;
+                else
                 i+=2;
             }
             else{ i=0;}
@@ -41,6 +45,7 @@ Cerradura positiva = +
         }
     //recorremos la expresión y vamos procesando
         for(i; i< postfija.length; i++){  
+            console.log(i, postfija[i], actualState);
             if(postfija[i] == ','){ //Si es un OR
                 actualState = or(actualState,i);
                 if(i + 1 == postfija.length){
@@ -55,18 +60,25 @@ Cerradura positiva = +
                     finalState += actualState;
                     break;
                 }
-               
-            }else
-            actualState =concat(actualState, i); //Se procesa la concatenación
+               console.log('entro');
+            }else{
+                actualState =concat(actualState, i); //Se procesa la concatenación
+            }
             }
             else if(postfija[i] == '*'){ //Si es cerradura estrella
-                actualState = star(actualState,actualState+1, i);
+                if((postfija[i+1] == ',' ||postfija[i+2] == ',' || postfija[i+3] == ',' || postfija[i-1] == ',')){ //Si está antes de un OR, se salta y se procesa hasta el OR
+                oneTransition(epsilon,actualState,actualState+1);
+                actualState+=1;
+                }
+                else{
+                    actualState = star(actualState,actualState+1, i);
+                }
             }
             else if(postfija[i] == '+'){ //Si es cerradura positiva
-                positive(actualState,actualState+1, i);
+                actualState = positive(actualState,actualState+1, i);
             }
             else  if(postfija[i+1] != '*' && postfija[i+1] != '+' && postfija[i+1] != '.'
-            && postfija[i+1] != ','&& postfija[i+2] != ',' && i+1 != postfija.length && postfija[i] != '.'){ //Si es una letra sin operador al principio
+            && postfija[i+1] != ','&& postfija[i+2] != ',' && postfija[i+3] != ',' && i+1 != postfija.length && postfija[i] != '.'){ //Si es una letra sin operador al principio
                 actualState = oneLetter(actualState, actualState+1,i);
             }
         }
@@ -85,7 +97,7 @@ Cerradura positiva = +
         console.log('Expresión regular postfija: ', postfija);
         console.log('Alfabeto: ', al);
 
-        if(matrizT.length >=10){
+        if(matrizT.length >=10 && finalState.length >1){
             for(let o=1; o<finalState.length; o++){
                 fS += finalState[o-1] + finalState[o]+';';
             }
@@ -147,6 +159,7 @@ Cerradura positiva = +
     }
 
     function star(actualState,nextState, i){     //CERRADURA ESTRELLA
+        console.log('star', actualState);
         extendMatrix(actualState);
         oneTransition(epsilon,actualState, nextState);
         actualState = nextState;
@@ -156,7 +169,7 @@ Cerradura positiva = +
         matrizT[actualState][pos] = actualState.toString();
 
         oneTransition(epsilon,actualState, actualState+1);
-        actualState+=1;
+        actualState+=1;        
     
         if(i + 1 == postfija.length){
             finalState += actualState;
@@ -166,6 +179,7 @@ Cerradura positiva = +
 
     function concat(actualState, i){     //CONCATENACION
             if((postfija[i-2] == '*'|| postfija[i-2] == '+' || postfija[i-2] == '.') && postfija[i-3] != ','){
+                
                 extendMatrix(actualState);
                 oneTransition(epsilon,actualState, actualState+1);
                 actualState +=  1;
@@ -196,9 +210,7 @@ Cerradura positiva = +
         oneTransition(pos,actualState, nextState);
         actualState = nextState;
         extendMatrix(actualState);
-
-        matrizT[actualState][pos] = actualState.toString();
-
+        oneTransition(pos,actualState, actualState);
         oneTransition(epsilon,actualState, actualState+1);
         actualState +=  1;
         if(i + 1 == postfija.length){
@@ -293,6 +305,7 @@ Cerradura positiva = +
                         console.log('more');
                         //Si no es el primer OR concatenado que encuentra
                         i = i+2;
+                        flag=true;
                         auxState += 1;
                         matrizT[initStateOR][epsilon]+= ','+ auxState.toString();
                         if(postfija[i-1] == '*'){
@@ -319,7 +332,11 @@ Cerradura positiva = +
                     if(i + 1 == postfija.length && finalState == ''){
                         finalState += actualState;
                     }
+                    else if(postfija[i+1] == '.' && i+2 ==postfija.length && finalState == ''){
+                        finalState += actualState;
+                    }
                     else{
                         oneTransition(epsilon, actualState, auxState+1);
+                        i= i+1;
                     }
          return auxState+1;}
