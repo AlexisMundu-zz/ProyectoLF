@@ -52,10 +52,47 @@ const M5 = (alfabeto, edoInicial, edosFinales, transiciones) => {
 		}
 	}
 
-	//Checamos cuales estados son equivalentes
-	console.log(tablaPares);
-	console.log(edosEquivalentes);
+	let edosEliminados = new Set([]);
+	let edosRemain = new Set([]);
+
+	
 	//Solo falta renombrar los estados equivalentes y acomodarlos en el autómata
+	edosEquivalentes.forEach((par) => {
+		edosRemain.add(par[0])
+		edosEliminados.add(par[1]);
+	});
+	
+	let edosMap = {};
+	let cont = 0;
+
+	for (let i = 0; i < transiciones.length; i++) {
+		if(!edosEliminados.has(i)){
+			if(edosRemain.has(i)){
+				edosEquivalentes.forEach((par) => {
+					if(par[0] === i){
+						edosMap[par[1]] = cont;
+					}
+				});
+				edosMap[i] = cont++;
+			}else{
+				edosMap[i] = cont++;
+			}
+		}
+	}
+
+	let lenNvasTrans = 0;
+	let nuevasTransiciones = [];
+	for (let i = 0; i < transiciones.length; i++) {
+		if(!edosEliminados.has(i)){
+			nuevasTransiciones[lenNvasTrans] = [];
+			for (let j = 0; j < alfabeto.length; j++) {
+				nuevasTransiciones[lenNvasTrans][j] = edosMap[transiciones[i][j]];
+			}	
+			lenNvasTrans++;
+		}
+	}
+
+	console.log(nuevasTransiciones);
 }
 
 const marcarCasilla = (tablaPares, i, j) => {
@@ -74,3 +111,4 @@ const removePar = (edosEquivalentes, i, j) => {
 
 M5("ab", 0, "2", [[1,2], [1,2], [3,3], [3,3]]);
 // M5("ab", 0, "1,2,5", [[1,2], [3,4], [4,3], [5,5], [5,5], [5,5]]);
+// M5("ab", 0, "2", [[1,5], [6,2], [0,2], [2,6], [7,5], [2,6], [6,4], [6,2]]);
