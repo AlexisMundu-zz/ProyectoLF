@@ -1,66 +1,84 @@
+  //M4. (20 puntos) Entrada: AFND Salida: AFD
+//Entrada ejemplo
+
 'use strict'
 
-// cadena ab
-// alfabeto ab
-// estado inicial 0
-// estado final 2;
-// transiciones [1;2;3] [1;2;3] // [2] [2;3] // [] [] // [] [2;3]
-
-const val = [
-  ['a','b'],
-  ['a','b'],
-  [0],
-  [2],
-  [ [[1,2,3], [1,2,3]], 
-    [[2],[2,3]],
-    [[],[]],
-    [[],[2,3]]
-  ],
+const alphabet = "ab";
+const initialS = 0;
+const finalS = "4";
+const transitions =  [ 
+  [[1,2,3], [4]], 
+  [[1,2,3],[4]],
+  [['/'],[4]],
+  [['/'],[4]],
+  [['/'],['/']]
 ];
 
-var AFNDtoAFD = (elements) => {
-  const chain = elements[0];
-  const alphabet = elements[1];
-  const initialS = elements[2];
-  const finalS = elements[3];
-  const transitions = elements[4];
-  var map = {};
-  
-  for(let i in transitions){
-    map[i] = transitions[i];
+// buscamos estados nuevos en las nuevas transiciones
+// hasta que no existan nuevos estados iteramos
+var newStates = (map,alphabet,transitions,finalS) =>{
+  let arrayS = [];
+  let flag = false;
+
+  if(Object.keys(map).length != 0){
+    arrayS.push(map[Object.keys(map)[0]]);// add initial state to array
   }
 
-  for(let i of transitions){
-    for(let j of i){
-      if(!Object.keys(map).includes(j.join('')) && j[0] != null){ // add new states
+  for(let i=0;i<Object.keys(map).length;i++){ // buscamos en los estados de la tabla
+    for(let j in map[Object.keys(map)[i]]){
+      let trans = map[Object.keys(map)[i]][j];
+      if(!Object.keys(map).includes(trans.join('')) && trans != '/' && trans != ''){
         let arrC = [];
-        for(let w in alphabet){ // find transition in x,y
+        for(let w in alphabet){ // buscamos en el alfabeto
           let aux = new Set();
-          for(let k of j){ // new state
-              for(let z of transitions[k][w]){
-                aux.add(z);
+          for(let s of trans){
+            for(let k of transitions[s][w]){
+              if(k != '/'){
+                aux.add(k);
+              }else{
+                flag = true;
               }
+            }
           }
-          arrC.push( [...aux].filter(x => x));
+          if(aux.size == 0) aux.add('/'); // add '/' state
+          arrC.push([...aux].filter(x => x));
         }
-        map[j.join('')] = arrC;
+        arrayS.push(arrC);
+        map[trans.join('')] = arrC;
       }
     }
   }
 
+  if(flag){
+    let arrC = [];
+    for(let w in alphabet){
+      arrC.push(['/']);
+    }
+    arrayS.push(arrC);
+    map['/'] = arrC;
+  }
+
   console.log(map);
+  console.log(arrayS);
 
+  // add final states 
+  return map, finalS;
 }
 
-var newStates = (transitions) => {
+var AFNDtoAFD = (alphabet, initialS, finalS, transitions) => {
+  alphabet = alphabet.split('');
+  finalS = finalS.split('');
+  var map = {};
 
+  map[initialS] = transitions[initialS];
+  
+  newStates(map,alphabet,transitions,finalS);
+
+  return alphabet, initialS, finalS, map;
 }
 
-AFNDtoAFD(val);
+AFNDtoAFD(alphabet, initialS, finalS, transitions);
 
 module.exports = {
   AFNDtoAFD
 };
-
-
-
