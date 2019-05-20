@@ -27,6 +27,8 @@ const M5 = (alfabeto, edoInicial, edosFinales, transiciones) => {
 		}
 	}
 
+
+
 	//Paso 3: Repetir lo siguiente hasta que no haya cambios:
 	//Si esxiste un par no-marcado {p,q} talque {d{p,a}, d{q,a}} está marcado para cada caracter en el alfabeto, entonces marcamos {p,q} 
 	let cambio = true;
@@ -99,7 +101,10 @@ const M5 = (alfabeto, edoInicial, edosFinales, transiciones) => {
 	}
 
 	//Para finalizar borramos de los estados finales los estados que se eliminaron por la minimización
-	edosFinales = edosFinales.filter(edo => !edosEliminados.has(edo)).join();
+	edosFinales = edosFinales.filter(edo => !edosEliminados.has(edo));
+	edosFinales = edosFinales.map((edo) => {
+		return edosMap[edo];
+	}).join();
 
 	return{
 		alfabeto, 
@@ -123,7 +128,6 @@ const removePar = (edosEquivalentes, i, j) => {
 	}
 }
 
-// M5("ab", 0, "2", [[1,2], [1,2], [3,3], [3,3]]);
-// M5("ab", 0, "1,2,5", [[1,2], [3,4], [4,3], [5,5], [5,5], [5,5]]);
-// M5("ab", 0, "2", [[1,5], [6,2], [0,2], [2,6], [7,5], [2,6], [6,4], [6,2]]);
+// console.log(M5("ab", 0, "2", [[1,2], [1,2], [3,3], [3,3]]));
+// console.log(M5("ab", 0, "2", [[1,5], [6,2], [0,2], [2,6], [7,5], [2,6], [6,4], [6,2]]));
 console.log(M5("ab", 0, "1,2,5", [[1,2], [3,4], [4,3], [5,5], [5,5], [5,5]]));

@@ -73,4 +73,4 @@ const getPrecedence = (c) => {
 	}
 }
 
-M1("(padre &+com),(www&+com)");
+M1("hscripts&+~");
