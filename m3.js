@@ -28,7 +28,7 @@ for(let k=0; k<matrizT.length; k++){
     for(let j=0; j<al.length; j++){
         matrizAFN[k][j] = eCerradura[matrizT[k][j+1]];
         if(eCerradura[matrizT[k][j+1]] == undefined){
-            matrizAFN[k][j] = [];
+            matrizAFN[k][j] = ['/'];
         }else{
             for(let o=0; o<estadoFinalAFN.length; o++){
                 if(eCerradura[matrizT[k][j+1]].includes(estadoFinalAFN[o])){
@@ -101,6 +101,10 @@ return ec;
 function print(){
     console.log('Alfabeto: ', al);
     console.log('Estado Inicial: ',estadoInicialAFN);
-    console.log('Estados Finales: ',estadoFinalAFN);
+    let eF ='';
+    for(let i =0; i<estadoFinalAFN.length; i++){
+        eF += estadoFinalAFN[i] +';';
+    }
+    console.log('Estados Finales: ',eF);
     console.log('Matriz', matrizAFN);
 }
