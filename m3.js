@@ -1,20 +1,22 @@
   'use strict'
 
   //input
-  let alfabeto = '$;a;b;';
+  let alfabeto = '$;a;b;c;';
   let estadoInicial = 0;
-  let estadosFinales = '3;';
-  let matrizT = [['/', '1', '/'],
-                [ '2', '/', '/' ],
-                [ '/', '/', '3' ],
-                [ '/', '/', '/' ] ];
+  let estadosFinales = '6;';
+  let matrizT = [ [ '/', '1', '/', '/' ],
+  [ '2', '/', '/', '/' ],
+  [ '/', '/', '3', '/' ],
+  [ '4', '/', '3', '/' ],
+  [ '5', '/', '/', '/' ],
+  [ '/', '/', '/', '6' ],
+  [ '/', '/', '/', '/' ]  ];
 
   
     let al =[];
     let estadoInicialAFN = estadoInicial;
     let estadoFinalAFN = [];
     let matrizAFN = [];
-  
 
   al= definirAlfabeto(alfabeto);
   definirEstadoFinal();
@@ -22,7 +24,8 @@
 
 let eCerradura = [matrizT.length];
 for(let i=0; i<matrizT.length; i++){
-    eCerradura[i] = epsilonCerradura(i); //sacar epsilon cerraduras
+    eCerradura[i]=[];
+    eCerradura[i] = epsilonCerradura(i,eCerradura[i]); //sacar epsilon cerraduras
 }
 for(let k=0; k<matrizT.length; k++){
     for(let j=0; j<al.length; j++){
@@ -57,8 +60,10 @@ function definirAlfabeto(alfabeto){
 function definirEstadoFinal(){
     let ef = '';
     for(let i=0; i<estadosFinales.length; i++){
-            ef += estadosFinales[i];
         if(estadosFinales[i] != ';'){
+            ef += estadosFinales[i];
+        }
+        else{
             estadoFinalAFN.push(Number(ef));
             ef = '';
         }
@@ -73,28 +78,38 @@ function crearMatrizAFN(){
     }
 }
 
-function epsilonCerradura(estadoActual){
-    let ec = [];
+function epsilonCerradura(estadoActual, ec){
     let toPush ='';
-    ec.push(estadoActual); //siempre puedes acceder a ti mismo con epsilon
+    let flag = false;
+    let nS;
+    if(!ec.includes(estadoActual))
+        ec.push(estadoActual); //siempre puedes acceder a ti mismo con epsilon
     if(matrizT[estadoActual][0] != '/'){
+        flag = true;
         if(matrizT[estadoActual][0].length >1){
             for(let a=0; a<matrizT[estadoActual][0].length; a++){
                 if(matrizT[estadoActual][0][a] != ','){
                    toPush+= matrizT[estadoActual][0][a];
                 }else{
                     ec.push(Number(toPush));
+                    nS = Number(toPush);
+                    ec = epsilonCerradura(nS,ec);
                     toPush = '';
                 }
                 if(a+1 == matrizT[estadoActual][0].length){
                     ec.push(Number(toPush));
+                    nS = Number(toPush);
+                    ec = epsilonCerradura(nS,ec);
                 }
             }
         }
         else{
             ec.push(Number(matrizT[estadoActual][0]));
+            nS = Number(matrizT[estadoActual][0]);
+            ec = epsilonCerradura(nS,ec);
         }
     }
+    
 return ec;
 }
 
@@ -103,8 +118,8 @@ function print(){
     console.log('Estado Inicial: ',estadoInicialAFN);
     let eF ='';
     for(let i =0; i<estadoFinalAFN.length; i++){
-        eF += estadoFinalAFN[i] +';';
+        eF += estadoFinalAFN[i];
     }
-    console.log('Estados Finales: ',eF);
+    console.log('Estados Finales: ',estadoFinalAFN);
     console.log('Matriz', matrizAFN);
 }
