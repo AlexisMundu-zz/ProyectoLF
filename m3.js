@@ -71,13 +71,15 @@ const epsilonCerradura =(matrizT,estadoActual, ec)=>{
     if(!ec.includes(estadoActual)) ec.push(estadoActual); //siempre puedes acceder a ti mismo con epsilon
     if(matrizT[estadoActual][0] != '/'){
         if(typeof matrizT[estadoActual][0] === 'number'){
+            if(!ec.includes(matrizT[estadoActual][0])){
             ec.push(matrizT[estadoActual][0]);
-            ec = epsilonCerradura(matrizT,matrizT[estadoActual][0],ec);
+            ec = epsilonCerradura(matrizT,matrizT[estadoActual][0],ec);}
         }
         else if(Array.isArray(matrizT[estadoActual][0])){
             for(let a =0; a<matrizT[estadoActual][0].length; a++){
+                if(!ec.includes(matrizT[estadoActual][0][a])){
                 ec.push(matrizT[estadoActual][0][a]);
-                ec = epsilonCerradura(matrizT,matrizT[estadoActual][0][a],ec);
+                ec = epsilonCerradura(matrizT,matrizT[estadoActual][0][a],ec);}
 
             }
         }
