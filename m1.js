@@ -40,7 +40,7 @@ const M1 = (regExpr) => {
 	while(pilaOperadores.length > 0){
 		notPosfija += pilaOperadores.pop();
 	}
-	console.log("Notación postfija: " + notPosfija);
+	return notPosfija;
 };
 
 
@@ -73,4 +73,4 @@ const getPrecedence = (c) => {
 	}
 }
 
-M1("hscripts&+~");
+module.exports = M1;
