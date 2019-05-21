@@ -102,7 +102,7 @@ var AFNDtoAFD = (alphabet, initialS, finalS, transitions) => {
   let ans = newStates(map,alphabet,transitions,finalS);
 
   map = ans[0];
-  finalS = ans[1];
+  finalS = ans[1].join('');
 
   console.log('Transiciones', map);
   console.log('Estados finales', finalS);
