@@ -1,5 +1,4 @@
 //M5. (20 puntos) Entrada: AFD Salida: AFD minimizado
-//Entrada ejemplo
 
 const M5 = (alfabeto, edoInicial, edosFinales, transiciones) => {
 	let edosEquivalentes = [];
@@ -28,6 +27,8 @@ const M5 = (alfabeto, edoInicial, edosFinales, transiciones) => {
 		}
 	}
 
+
+
 	//Paso 3: Repetir lo siguiente hasta que no haya cambios:
 	//Si esxiste un par no-marcado {p,q} talque {d{p,a}, d{q,a}} está marcado para cada caracter en el alfabeto, entonces marcamos {p,q} 
 	let cambio = true;
@@ -52,10 +53,65 @@ const M5 = (alfabeto, edoInicial, edosFinales, transiciones) => {
 		}
 	}
 
-	//Checamos cuales estados son equivalentes
-	console.log(tablaPares);
-	console.log(edosEquivalentes);
-	//Solo falta renombrar los estados equivalentes y acomodarlos en el autómata
+	//Agregamos dos Sets donde mantendremos un control de los estados que se eliminan y los que se quedan
+	let edosEliminados = new Set([]);
+	let edosRemain = new Set([]);
+
+	edosEquivalentes.forEach((par) => {
+		edosRemain.add(par[0])
+		edosEliminados.add(par[1]);
+	});
+	
+	//Mapa que tiene la función de retornar el estado al que apuntan ahora los nuevos estados
+	//Ejemplo si se colapsan un edo 0 y 1 ahora decimos que el edo 1 se eliminará y 0 quedará
+	//así que en el mapa como llave será el estado anterior y de valor el nuevo nombre del estado que equivale a la equivalencia de los dos estados
+	// 0 => 0
+	// 1 => 0
+	let edosMap = {};
+	let cont = 0;
+
+	//Se itera cada estado y si no es uno que se eliminará, entonces lo agregamos a edosMap
+	//para de esa forma declarar su nuevo nombre de estado
+	for (let i = 0; i < transiciones.length; i++) {
+		if(!edosEliminados.has(i)){
+			if(edosRemain.has(i)){
+				edosEquivalentes.forEach((par) => {
+					if(par[0] === i){
+						edosMap[par[1]] = cont;
+					}
+				});
+				edosMap[i] = cont++;
+			}else{
+				edosMap[i] = cont++;			
+			}
+		}
+	}
+
+	//Se crea un nuevo arreglo de transiciones que contiene todas las transiciones después de la minimización
+	let lenNvasTrans = 0;
+	let nuevasTransiciones = [];
+	for (let i = 0; i < transiciones.length; i++) {
+		if(!edosEliminados.has(i)){
+			nuevasTransiciones[lenNvasTrans] = [];
+			for (let j = 0; j < alfabeto.length; j++) {
+				nuevasTransiciones[lenNvasTrans][j] = edosMap[transiciones[i][j]];
+			}	
+			lenNvasTrans++;
+		}
+	}
+
+	//Para finalizar borramos de los estados finales los estados que se eliminaron por la minimización
+	edosFinales = edosFinales.filter(edo => !edosEliminados.has(edo));
+	edosFinales = edosFinales.map((edo) => {
+		return edosMap[edo];
+	}).join();
+
+	return{
+		alfabeto, 
+		edoInicial,
+		edosFinales,
+		transiciones: nuevasTransiciones
+	}
 }
 
 const marcarCasilla = (tablaPares, i, j) => {
@@ -72,5 +128,6 @@ const removePar = (edosEquivalentes, i, j) => {
 	}
 }
 
-M5("ab", 0, "2", [[1,2], [1,2], [3,3], [3,3]]);
-// M5("ab", 0, "1,2,5", [[1,2], [3,4], [4,3], [5,5], [5,5], [5,5]]);
+// console.log(M5("ab", 0, "2", [[1,2], [1,2], [3,3], [3,3]]));
+// console.log(M5("ab", 0, "2", [[1,5], [6,2], [0,2], [2,6], [7,5], [2,6], [6,4], [6,2]]));
+console.log(M5("ab", 0, "", [[1,2], [3,4], [4,3], [5,5], [5,5], [5,5]]));
