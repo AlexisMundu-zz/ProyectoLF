@@ -84,9 +84,9 @@ var newStates = (map,alphabet,transitions,finalS) =>{
     finalSaux[i] = statesOrder.indexOf(finalSaux[i]) + 1;
   }
 
-  console.log('Estados finales:', finalSaux); // estados finales
-  console.log(map); // tabla con etiquetas
-  console.log(arrayS); // tabla sin etiquetas
+  //console.log('Estados finales:', finalSaux); // estados finales
+  //console.log(map); // tabla con etiquetas
+  //console.log(arrayS); // tabla sin etiquetas
 
   // add final states 
   return [arrayS, finalSaux];
@@ -103,6 +103,9 @@ var AFNDtoAFD = (alphabet, initialS, finalS, transitions) => {
 
   map = ans[0];
   finalS = ans[1];
+
+  console.log('Transiciones', map);
+  console.log('Estados finales', finalS);
 
   return [alphabet, initialS, finalS, map];
 }
