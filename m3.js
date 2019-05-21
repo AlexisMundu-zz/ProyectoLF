@@ -1,6 +1,5 @@
   'use strict'
 
-  //input
   const M3 = (alfabeto, estadoInicial, estadoFinal, matrizT)=>{
     let al =[];
     let estadoInicialAFN = estadoInicial;
@@ -31,10 +30,17 @@
             }
         }
     }
+
+    //Convertir los estados finales a un String como el m4 los recibe
+    let eF ='';
+    for(let i =0; i<estadoFinalAFN.length; i++){
+        eF += estadoFinalAFN[i] +';';
+    }
+
     return{
         alphabet: al,
         initialS: estadoInicialAFN,
-        finalS: estadoFinalAFN,
+        finalS: eF,
         transitions: matrizAFN
     };
   }
