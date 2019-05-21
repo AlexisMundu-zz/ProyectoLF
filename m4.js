@@ -3,12 +3,12 @@
 
 'use strict'
 
-const alphabet = "ab";
+const alphabet = "01";
 const initialS = 0;
-const finalS = "4";
+const finalS = "3";
 const transitions =  [ 
   [[1,2,3], [4]], 
-  [[1,2,3],[4]],
+  [[1,2,3], [4]],
   [['/'],[4]],
   [['/'],[4]],
   [['/'],['/']]
@@ -18,6 +18,7 @@ const transitions =  [
 // hasta que no existan nuevos estados iteramos
 var newStates = (map,alphabet,transitions,finalS) =>{
   let arrayS = [];
+  let statesOrder = [];
   let flag = false;
 
   if(Object.keys(map).length != 0){
@@ -44,6 +45,7 @@ var newStates = (map,alphabet,transitions,finalS) =>{
           arrC.push([...aux].filter(x => x));
         }
         arrayS.push(arrC);
+        statesOrder.push(trans.join(''));
         map[trans.join('')] = arrC;
       }
     }
@@ -68,12 +70,26 @@ var newStates = (map,alphabet,transitions,finalS) =>{
     }
   }
 
-  console.log(finalSaux); // estados finales
-  console.log(map); // tabla con etiquetas
+  for(let i in arrayS){
+    for(let w in alphabet){
+      if(arrayS[i][w].join('') != '/'){
+        arrayS[i][w] = statesOrder.indexOf(arrayS[i][w].join('')) + 1;
+      }else{
+        arrayS[i][w] = statesOrder.length + 1;
+      }
+    }
+  }
+
+  for(let i in finalSaux){
+    finalSaux[i] = statesOrder.indexOf(finalSaux[i]) + 1;
+  }
+
+  //console.log('Estados finales:', finalSaux); // estados finales
+  //console.log(map); // tabla con etiquetas
   //console.log(arrayS); // tabla sin etiquetas
 
   // add final states 
-  return [map, finalSaux];
+  return [arrayS, finalSaux];
 }
 
 var AFNDtoAFD = (alphabet, initialS, finalS, transitions) => {
@@ -86,7 +102,10 @@ var AFNDtoAFD = (alphabet, initialS, finalS, transitions) => {
   let ans = newStates(map,alphabet,transitions,finalS);
 
   map = ans[0];
-  finalS = ans[1];
+  finalS = ans[1].join('');
+
+  console.log('Transiciones', map);
+  console.log('Estados finales', finalS);
 
   return [alphabet, initialS, finalS, map];
 }
